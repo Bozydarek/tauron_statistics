@@ -1,0 +1,9 @@
+.mypy_cache/
+__pycache__/
+
+config.yml
+cache.csv*
+local_test.py
+*.json
+
+.vscode/

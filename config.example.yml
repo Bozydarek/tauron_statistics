@@ -1,0 +1,9 @@
+meter_id: XXXXXXXX
+username: "<username>"
+password: "<password>"
+price: 1.00  # price for kWh
+fixed_cost: 23.45  # monthly fixed cost
+installation_date: "YYYY-MM-DD"  # since when renewable energy is available
+extra_headers:
+  - name: "example"
+    value: "example"
