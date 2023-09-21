@@ -16,6 +16,21 @@ This repository contains a python scripts that can check your energy usage stati
 * python 3.10+
 * packages from `requirements.txt`
 
+# Configuration file
+
+To use this script you need to create a configuration (`config.yml`) based on the example (`config.example.yml`).
+
+Required values:
+* meter_id
+* username
+* password
+* installation_date ("YYYY-MM-DD" format)
+
+Optional values:
+* price
+* fixed_cost
+* extra_headers
+
 ## Usage examples
 
 ```

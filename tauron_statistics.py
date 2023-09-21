@@ -34,13 +34,15 @@ def main() -> None:
 
     config = load_config()
     try:
+        # Required:
         meter_id = config["meter_id"]
         username = config["username"]
         password = config["password"]
-
-        price_kWh = config["price"]
-        monthly_fixed_cost = config["fixed_cost"]
         installation_date = date.fromisoformat(config["installation_date"])
+
+        # Optional:
+        price_kWh = config.get("price", None)
+        monthly_fixed_cost = config.get("fixed_cost", None)
     except KeyError as e:
         print(f"[Error] Key {e} not found in config file")
         exit(1)
@@ -147,10 +149,12 @@ def main() -> None:
         months += 1
 
     totalBalance = totalRE * RE_RETRIEVE_RATIO - totalUsage
-    energy_cost = round(
-        (-1 * totalBalance * price_kWh if totalBalance < 0 else 0.0), 2)
-    fixed_cost = months * monthly_fixed_cost
-    estimated_cost = energy_cost + fixed_cost
+
+    if price_kWh is not None and monthly_fixed_cost is not None:
+        energy_cost = round(
+            (-1 * totalBalance * price_kWh if totalBalance < 0 else 0.0), 2)
+        fixed_cost = months * monthly_fixed_cost
+        estimated_cost = energy_cost + fixed_cost
 
     # Print estimation for current month
     # We need at least one day of data and we don't need estimations
@@ -181,6 +185,9 @@ def main() -> None:
     print(f"> Lost RE:      {totalRE*0.2:{WIDTH}.{PRECISION}f} kWh")
     print(f"> RE to use:    {totalRE*RE_RETRIEVE_RATIO:{WIDTH}.{PRECISION}f} kWh")
     print(f"> Balance:      {color_balance(totalBalance, WIDTH, 'kWh')}")
+
+    if price_kWh is None or monthly_fixed_cost is None:
+        exit()
     print(f"> Estim. cost:  {estimated_cost:{WIDTH}.{PRECISION}f} PLN (fix. {fixed_cost:.{PRECISION}f} PLN)")
 
 
