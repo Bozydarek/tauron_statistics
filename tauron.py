@@ -91,7 +91,6 @@ def gather_and_parse_data_from_tauron(
             else:
                 # try to parse data
                 try:
-                    print(response.text)
                     eng_data[eng_type] = MonthlyData.parseData(
                         eng_type, iter_date, response.json()["data"])
                 except simplejson.JSONDecodeError as e:

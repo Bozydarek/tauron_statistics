@@ -3,7 +3,7 @@
 This repository contains a python scripts that can check your energy usage statistics (from eLicznik service) and show them in a form of a simple ASCII table.
 
 ## Requirements
-* python3.9+
+* python 3.10+
 * packages from `requirements.txt`
 
 ## Usage examples

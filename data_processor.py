@@ -24,6 +24,21 @@ DataTypes.consume.__doc__ = "Energy consumed (taken from the grid)"
 DataTypes.oze.__doc__ = "Energy generated (sent back to the grid)"
 
 
+def rfilter_nones(_list: list[Any | None]) -> list[Any]:
+    """Remove None values from the list, starting from the end
+    util the first non-None value."""
+
+    # Find the index of the first non-None value from right
+    idx = next((
+        i for i, val in enumerate(reversed(_list)) if val is not None),
+        None)
+
+    if idx == 0:
+        return _list
+
+    return _list[:-idx] if idx is not None else []
+
+
 @dataclass
 class MonthlyData:
     """This dataclass represents data points from Tauron API.
@@ -49,7 +64,7 @@ class MonthlyData:
             raise ValueError("Provided data are in unsupported shape")
 
         # Filter out Nones
-        values: list[float] = list(filter(None, data["values"]))
+        values: list[float] = rfilter_nones(data["values"])
 
         return cls(
             month=date,
@@ -116,8 +131,8 @@ class DataPoint:
         if (start_date is not None and
                 start_date.year == processed_month.year and
                 start_date.month == processed_month.month):
-            # NOTE: For older dates API behaves differently
-            # and returns already trimmed data
+            # NOTE: This step might not be needed - after switching  to OZE
+            # API return None values for day before OZE
             if last_day_of_month(start_date).day == len(consume_data.values):
                 print("Trimming data...")
                 day = start_date.day - 1  # Tables indexes start from 0

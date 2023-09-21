@@ -94,7 +94,7 @@ def main() -> None:
 
             all_data.extend(processed_data)
 
-            print(f"[Note] Last day with usefull data is {date_of_last_dp}")
+            print(f"[Note] Last day with useful data is {date_of_last_dp}")
 
             if args.use_cache:
                 # NOTE: there is no point in saving cache,
