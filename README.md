@@ -2,7 +2,7 @@
 
 This repository contains a python scripts that can check your energy usage statistics (based on unofficial API from eLicznik service) and show them in a form of a simple ASCII table.
 
-**Disclaimer: Use at Your Own Risk**
+**Disclaimer: Use at Your Own Risk. ⚠️**
 
 ## Features
 
@@ -21,15 +21,15 @@ This repository contains a python scripts that can check your energy usage stati
 To use this script you need to create a configuration (`config.yml`) based on the example (`config.example.yml`).
 
 Required values:
-* meter_id
-* username
-* password
-* installation_date ("YYYY-MM-DD" format)
+* `meter_id`
+* `username`
+* `password`
+* `installation_date` ("YYYY-MM-DD" format)
 
 Optional values:
-* price
-* fixed_cost
-* extra_headers
+* `price`
+* `fixed_cost`
+* `extra_headers`
 
 ## Usage examples
 
