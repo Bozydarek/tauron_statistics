@@ -13,7 +13,7 @@ This repository contains a python scripts that can check your energy usage stati
 * Calculating a simple estimation for the current month
 
 ## Requirements
-* python 3.10+
+* python 3.11+
 * packages from `requirements.txt`
 
 # Configuration file

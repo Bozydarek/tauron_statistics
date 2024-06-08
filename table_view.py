@@ -5,12 +5,12 @@ from dataclasses import dataclass
 
 from typing import Any
 
-from util import bColors, color_balance, PRECISION
+from util import Color, balance_color, PRECISION
 
 LINE = ["---"]
 
 
-class CellAligment(Enum):
+class CellAlignment(Enum):
     LEFT = "<"
     RIGHT = ">"
 
@@ -18,8 +18,8 @@ class CellAligment(Enum):
 @dataclass
 class Cell():
     content: Any
-    color: bColors | str | None = None
-    alignment: CellAligment = CellAligment.LEFT
+    color: Color | str | None = None
+    alignment: CellAlignment = CellAlignment.LEFT
     width: int | None = None
 
 
@@ -48,25 +48,24 @@ class TableView():
                 continue
 
             for i, cell in enumerate(row):
-                if type(cell) is Cell:
-                    value = cell.content
-                    width = self.width if cell.width is None else cell.width
-                    # TODO: Change bColors into Enum to support this case
-                    # if type(cell.color) is bColors:
-                    #     value = f"{cell.color}{value}{bColors.END}"
-                    #     print(cell.color, value)
-                    #     width += len(value) - len(str(cell.content))
-                    if cell.color == "balance":
-                        value = color_balance(cell.content)
-                        num_width = len(f"{cell.content:.{PRECISION}f}")
-                        width += len(value) - num_width
-                    out += f"| {value:{cell.alignment.value}{width}} "
-                else:
-                    # TODO: Refactor this part
-                    if i == 0:
-                        out += f"| {cell:<{self.width}} "
-                    else:
-                        out += f"| {cell:>{self.width}} "
+                if type(cell) is not Cell:
+                    alignment = (CellAlignment.LEFT if i == 0
+                                 else CellAlignment.RIGHT)
+                    cell = Cell(cell, alignment=alignment)
+
+                value = cell.content
+                width = self.width if cell.width is None else cell.width
+
+                if type(cell.color) is Color:
+                    value = f"{cell.color}{value}{Color.END}"
+                    width += len(value) - len(str(cell.content))
+
+                elif cell.color == "balance":
+                    value = balance_color(cell.content)
+                    num_width = len(f"{cell.content:.{PRECISION}f}")
+                    width += len(value) - num_width
+
+                out += f"| {value:{cell.alignment.value}{width}} "
 
             out += "|\n"
 

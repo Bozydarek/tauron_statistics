@@ -1,5 +1,6 @@
 import csv
 import sys
+from enum import StrEnum
 from datetime import date
 
 import yaml
@@ -16,7 +17,7 @@ WIDTH = 8
 PRECISION = 2
 
 
-class bColors:
+class Color(StrEnum):
     RED = '\033[91m'
     GREEN = '\033[92m'
     PURPLE = '\033[95m'
@@ -24,16 +25,16 @@ class bColors:
 
 
 def print_wrn(*msg: Sequence[Any]) -> None:
-    print(f"{bColors.PURPLE}[WARNING]{bColors.END}", *msg, file=sys.stderr)
+    print(f"{Color.PURPLE}[WARNING]{Color.END}", *msg, file=sys.stderr)
 
 
 def print_err(*msg: Sequence[Any], interrupt: bool = True) -> None:
-    print(f"{bColors.RED}[ERROR]{bColors.END}", *msg, file=sys.stderr)
+    print(f"{Color.RED}[ERROR]{Color.END}", *msg, file=sys.stderr)
     if interrupt:
         exit(1)
 
 
-def color_balance(num: Numeric, padding: int = 0, unit: str = "") -> str:
+def balance_color(num: Numeric, padding: int = 0, unit: str = "") -> str:
     if isinstance(num, float):
         out = f"{num:.{PRECISION}f}"
 
@@ -41,8 +42,8 @@ def color_balance(num: Numeric, padding: int = 0, unit: str = "") -> str:
         unit = " " + unit
 
     return (
-        f"{bColors.RED if num < 0 else bColors.GREEN}"
-        f"{out:>{padding}}{unit}{bColors.END}")
+        f"{Color.RED if num < 0 else Color.GREEN}"
+        f"{out:>{padding}}{unit}{Color.END}")
 
 
 def load_cache() -> list[DataPoint]:

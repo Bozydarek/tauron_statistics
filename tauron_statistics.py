@@ -5,11 +5,11 @@ from dateutil import relativedelta as rd
 
 from data_processor import DataPoint, RE_RETRIEVE_RATIO
 from month import last_day_of_month
-from table_view import TableView, Cell, CellAligment
+from table_view import TableView, Cell, CellAlignment
 from tauron import login_to_tauron, gather_and_parse_data_from_tauron
 from util import (
     load_config, load_cache, save_cache,
-    color_balance, WIDTH, PRECISION, print_err)
+    balance_color, WIDTH, PRECISION, print_err)
 
 
 def main() -> None:
@@ -141,7 +141,7 @@ def main() -> None:
             f"{RE:.{PRECISION}f}",
             f"{RE*RE_RETRIEVE_RATIO:.{PRECISION}f}",
             positive_days,
-            Cell(balance, "balance", CellAligment.RIGHT)
+            Cell(balance, "balance", CellAlignment.RIGHT)
         ])
 
         totalUsage += usage
@@ -174,7 +174,7 @@ def main() -> None:
             f"{ratio*RE:.{PRECISION}f}",
             f"{ratio*RE*RE_RETRIEVE_RATIO:.{PRECISION}f}",
             int(ratio*positive_days),
-            Cell(ratio*balance, "balance", CellAligment.RIGHT)
+            Cell(ratio*balance, "balance", CellAlignment.RIGHT)
         ])
 
     print(table, end="")
@@ -184,7 +184,7 @@ def main() -> None:
     print(f"> Total RE:     {totalRE:{WIDTH}.{PRECISION}f} kWh")
     print(f"> Lost RE:      {totalRE*0.2:{WIDTH}.{PRECISION}f} kWh")
     print(f"> RE to use:    {totalRE*RE_RETRIEVE_RATIO:{WIDTH}.{PRECISION}f} kWh")
-    print(f"> Balance:      {color_balance(totalBalance, WIDTH, 'kWh')}")
+    print(f"> Balance:      {balance_color(totalBalance, WIDTH, 'kWh')}")
 
     if price_kWh is None or monthly_fixed_cost is None:
         exit()
