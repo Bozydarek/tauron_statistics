@@ -5,7 +5,7 @@ from dateutil import relativedelta as rd
 
 from data_processor import DataPoint, RE_RETRIEVE_RATIO
 from month import last_day_of_month
-from table_view import TableView
+from table_view import TableView, Cell, CellAligment
 from tauron import login_to_tauron, gather_and_parse_data_from_tauron
 from util import (
     load_config, load_cache, save_cache,
@@ -16,7 +16,7 @@ def main() -> None:
     date_today = date.today()
 
     parser = argparse.ArgumentParser(
-        description='Gather and agragate data from Tauron eLicznik')
+        description='Gather and aggregate data from Tauron eLicznik')
     parser.add_argument(
         '-y', '--year',
         dest='data_year', nargs='?', const=date_today.year, type=int,
@@ -108,8 +108,8 @@ def main() -> None:
         print(f"# Data for {args.data_year} year only! #")
 
     table = TableView()
-    table.headers = [
-        "Date", "Usage", "kWh/day", "RE", "RE 2 use", "(+) days", "Balance"]
+    table.set_header([
+        "Date", "Usage", "kWh/day", "RE", "RE 2 use", "(+) days", "Balance"])
 
     totalUsage = 0.0
     totalRE = 0.0
@@ -141,7 +141,7 @@ def main() -> None:
             f"{RE:.{PRECISION}f}",
             f"{RE*RE_RETRIEVE_RATIO:.{PRECISION}f}",
             positive_days,
-            color_balance(balance, WIDTH)
+            Cell(balance, "balance", CellAligment.RIGHT)
         ])
 
         totalUsage += usage
@@ -174,7 +174,7 @@ def main() -> None:
             f"{ratio*RE:.{PRECISION}f}",
             f"{ratio*RE*RE_RETRIEVE_RATIO:.{PRECISION}f}",
             int(ratio*positive_days),
-            color_balance(ratio*balance, WIDTH)
+            Cell(ratio*balance, "balance", CellAligment.RIGHT)
         ])
 
     print(table, end="")
