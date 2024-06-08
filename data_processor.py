@@ -1,11 +1,14 @@
-from enum import Enum
+import csv
+import yaml
 
+from enum import Enum
 from datetime import date
 from dataclasses import dataclass
 
 from typing import Any
 
 from month import last_day_of_month
+from util import print_err, print_wrn, print_note
 
 RE_RETRIEVE_RATIO = 0.8  # 80% of cumulated energy sent to the grid
 
@@ -134,7 +137,7 @@ class DataPoint:
             # NOTE: This step might not be needed - after switching  to OZE
             # API return None values for day before OZE
             if last_day_of_month(start_date).day == len(consume_data.values):
-                print("Trimming data...")
+                print_note("Trimming data...")
                 day = start_date.day - 1  # Tables indexes start from 0
                 consume_data.values = consume_data.values[day:]
                 oze_data.values = oze_data.values[day:]
@@ -156,3 +159,58 @@ class DataPoint:
             balance,
             last_day,
             positive_days)
+
+
+def load_cache() -> list[DataPoint]:
+    data = []
+    try:
+        with open('cache.csv') as csvfile:
+            reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+            for row in reader:
+                if len(row) != 6:
+                    raise ValueError(
+                        f"each row supposed to have 6 elements, "
+                        f"{len(row)} found instead.")
+
+                data.append(DataPoint(
+                    date.fromisoformat(row[0]),
+                    float(row[1]),
+                    float(row[2]),
+                    float(row[3]),
+                    int(row[4]),
+                    int(row[5]),
+                ))
+    except IOError:
+        print_wrn("Cache file is not accessible.")
+    except ValueError as e:
+        print_wrn(f"Cache file is corrupted: {e}")
+        return []
+
+    return data
+
+
+def load_config() -> dict[str, Any]:
+    with open("config.yml", 'r') as config_file:
+        try:
+            config = yaml.safe_load(config_file)
+        except yaml.YAMLError as e:
+            print_err(f"There is a problem with configuration file: {e}")
+        else:
+            print_note("Configuration file loaded.")
+    return config
+
+
+def save_cache(
+        data: list[DataPoint], date_today: date) -> None:
+
+    data_to_save = data
+    if (data_to_save[-1].month.year == date_today.year and
+            data_to_save[-1].month.month == date_today.month):
+        data_to_save = data[:-1]
+
+    print_note("Save cache...")
+    with open('cache.csv', 'w') as csvfile:
+        cache = csv.writer(
+            csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+        cache.writerows(data_to_save)

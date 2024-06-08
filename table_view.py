@@ -1,5 +1,9 @@
 # NOTE: I tried a few different libraries to do this
 # but non of them works exactly as I want to, so ...
+import csv
+import json
+
+from io import StringIO
 from enum import Enum
 from dataclasses import dataclass
 
@@ -22,17 +26,21 @@ class Cell():
     alignment: CellAlignment = CellAlignment.LEFT
     width: int | None = None
 
+    def __str__(self) -> str:
+        # NOTE: used for json and csv format
+        return str(self.content)
+
 
 class TableView():
-    _headers: list[str] = []
-    _rows: list[list[Any]] = []
+    headers: list[str] = []
+    rows: list[list[Any]] = []
 
     def __init__(self, col_width: int = 8) -> None:
         self.width = col_width
 
     def __str__(self) -> str:
         out = ""
-        for h in self._headers:
+        for h in self.headers:
             out += f"| {h:<{self.width}} "
         out += "|\n"
 
@@ -42,7 +50,7 @@ class TableView():
         out = line + out
         out += line
 
-        for row in self._rows:
+        for row in self.rows:
             if row == LINE:
                 out += line
                 continue
@@ -74,11 +82,27 @@ class TableView():
         return out
 
     def add_row(self, row: list[Any] = []) -> None:
-        self._rows.append(row)
+        self.rows.append(row)
 
     def add_divider(self) -> None:
-        self._rows.append(LINE)
+        self.rows.append(LINE)
 
     def set_header(self, header: list[Any], config: Any = None) -> None:
-        self._headers = header
+        self.headers = header
         # TODO: header configuration
+
+    def to_json(self) -> str:
+        return json.dumps(
+            [dict(zip(self.headers, map(str, row))) for row in self.rows
+             if row != LINE],
+            indent=4)
+
+    def to_csv(self) -> str:
+        output = StringIO()
+        writer = csv.writer(output, delimiter=";")
+        writer.writerow(self.headers)
+        for row in self.rows:
+            if row != LINE:
+                writer.writerow(map(str, row))
+
+        return output.getvalue()

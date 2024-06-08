@@ -3,13 +3,13 @@ from datetime import date
 
 from dateutil import relativedelta as rd
 
-from data_processor import DataPoint, RE_RETRIEVE_RATIO
+from data_processor import (
+    DataPoint, RE_RETRIEVE_RATIO, load_config, load_cache, save_cache)
 from month import last_day_of_month
 from table_view import TableView, Cell, CellAlignment
 from tauron import login_to_tauron, gather_and_parse_data_from_tauron
 from util import (
-    load_config, load_cache, save_cache,
-    balance_color, WIDTH, PRECISION, print_err)
+    balance_color, WIDTH, PRECISION, print_err, print_note)
 
 
 def main() -> None:
@@ -29,6 +29,10 @@ def main() -> None:
         '--off', '--offline', dest='offline', action='store_true',
         help='Don\'t download data from the Tauron eLicznik.'
     )
+    parser.add_argument(
+        '-f', '--format', nargs='?', choices=["csv", "json"],
+        help="Simplify output (showing only table) and use csv or json format."
+    )
 
     args = parser.parse_args()
 
@@ -44,10 +48,10 @@ def main() -> None:
         price_kWh = config.get("price", None)
         monthly_fixed_cost = config.get("fixed_cost", None)
     except KeyError as e:
-        print(f"[Error] Key {e} not found in config file")
+        print_err(f"Key {e} not found in config file")
         exit(1)
     except ValueError as e:
-        print(f"[Error] {e}")
+        print_err(f"[Error] {e}")
         exit(1)
 
     all_data: list[DataPoint] = []
@@ -60,19 +64,19 @@ def main() -> None:
                 f"Selected year must be between "
                 f"{installation_date.year} and {date_today.year}")
         if args.data_year != date_today.year:
-            print(
-                "[Note] You can use offline mode, "
+            print_note(
+                "You can use offline mode, "
                 "if you already have data in cache.")
 
         if iter_date.year < args.data_year:
             iter_date = date(args.data_year, 1, 1)
 
     if not args.use_cache and args.offline:
-        print("There are no data to process. Use cache or online mode.")
+        print_note("There are no data to process. Use cache or online mode.")
         exit(0)
 
     if args.use_cache:
-        print("Loading cache data...")
+        print_note("Loading cache data...")
         cache_data = sorted(load_cache(), key=(lambda x: x.month))
         if cache_data != []:
             all_data.extend(cache_data)
@@ -82,13 +86,14 @@ def main() -> None:
             iter_date = last_date_in_cache + rd.relativedelta(months=+1, day=1)
 
     if iter_date == date_today:
-        print(
-            "[Note] Today is the first day of the month. "
+        print_note(
+            "Today is the first day of the month. "
             "All available data points were loaded from cache.")
     elif not args.offline:
         session = login_to_tauron(username, password, config["extra_headers"])
         processed_data = gather_and_parse_data_from_tauron(
-            session, meter_id, iter_date, date_today, installation_date)
+            session, meter_id, iter_date, date_today, installation_date,
+            args.format is not None)
 
         if len(processed_data):
             date_of_last_dp = processed_data[-1].month + rd.relativedelta(
@@ -96,7 +101,7 @@ def main() -> None:
 
             all_data.extend(processed_data)
 
-            print(f"[Note] Last day with useful data is {date_of_last_dp}")
+            print_note(f"Last day with useful data is {date_of_last_dp}")
 
             if args.use_cache:
                 # NOTE: there is no point in saving cache,
@@ -105,7 +110,7 @@ def main() -> None:
 
     # print data
     if args.data_year is not None:
-        print(f"# Data for {args.data_year} year only! #")
+        print_note(f"# Data for {args.data_year} year only! #")
 
     table = TableView()
     table.set_header([
@@ -176,6 +181,15 @@ def main() -> None:
             int(ratio*positive_days),
             Cell(ratio*balance, "balance", CellAlignment.RIGHT)
         ])
+
+    if args.format == "csv":
+        print(table.to_csv())
+    elif args.format == "json":
+        print(table.to_json())
+
+    if args.format is not None:
+        # No summary if we want different format
+        exit(0)
 
     print(table, end="")
 

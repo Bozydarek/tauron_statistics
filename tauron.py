@@ -6,7 +6,7 @@ from dateutil import relativedelta as rd
 
 from data_processor import DataTypes, MonthlyData, DataPoint
 from month import months_between, last_day_of_month
-from util import print_wrn, print_err
+from util import print_wrn, print_err, print_note
 
 LOGIN_URL = "https://logowanie.tauron-dystrybucja.pl/login"
 ELICZNIK_URL = "https://elicznik.tauron-dystrybucja.pl"
@@ -32,7 +32,7 @@ def login_to_tauron(
             continue
         HEADERS[eh["name"]] = eh["value"]
 
-    print("Starting session...")
+    print_note("Starting session...")
     # NOTE: Login service require two requests for some reason
     session = requests.Session()
     p1 = session.request(
@@ -53,17 +53,19 @@ def gather_and_parse_data_from_tauron(
         meter_id: str,
         iter_date: date,
         date_today: date,
-        installation_date: date) -> list[DataPoint]:
+        installation_date: date,
+        quiet: bool = False) -> list[DataPoint]:
     # if date_today > iter_date we will gather additional month (current)
     # otherwise it's mean that date_today == iter_date (1st day of month)
     months_to_gather = (
         months_between(date_today, iter_date) +
         int(date_today > iter_date) - int(date_today.day == 1))
 
-    print(
-        f"Gathering data for {months_to_gather} "
-        f"month{'s' if months_to_gather > 1 else ''}... ")
-    print("[", end='', flush=True)
+    if not quiet:
+        print_note(
+            f"Gathering data for {months_to_gather} "
+            f"month{'s' if months_to_gather > 1 else ''}... ")
+        print("[", end='', flush=True)
     data: list[DataPoint] = []
     while (iter_date < date_today):
         # NOTE: "new API" specification:
@@ -103,7 +105,10 @@ def gather_and_parse_data_from_tauron(
             installation_date))
 
         iter_date += rd.relativedelta(months=+1, day=1)
-        print(".", end='', flush=True)
-    print("]")
+
+        if not quiet:
+            print(".", end='', flush=True)
+    if not quiet:
+        print("]")
 
     return data
