@@ -40,7 +40,7 @@ class TableView():
 
     def __str__(self) -> str:
         out = ""
-        for h in self.headers:
+        for h in self.get_header():
             out += f"| {h:<{self.width}} "
         out += "|\n"
 
@@ -87,20 +87,27 @@ class TableView():
     def add_divider(self) -> None:
         self.rows.append(LINE)
 
-    def set_header(self, header: list[Any], config: Any = None) -> None:
+    def set_header(self, header: list[tuple[str, str]],
+                   config: Any = None) -> None:
         self.headers = header
         # TODO: header configuration
 
+    def get_header(self, id_mode: bool = False) -> list[str]:
+        if id_mode:
+            return [header[0] for header in self.headers]
+        return [header[1] for header in self.headers]
+
     def to_json(self) -> str:
         return json.dumps(
-            [dict(zip(self.headers, map(str, row))) for row in self.rows
+            [dict(zip(self.get_header(True), map(str, row)))
+             for row in self.rows
              if row != LINE],
             indent=4)
 
     def to_csv(self) -> str:
         output = StringIO()
         writer = csv.writer(output, delimiter=";")
-        writer.writerow(self.headers)
+        writer.writerow(self.get_header(True))
         for row in self.rows:
             if row != LINE:
                 writer.writerow(map(str, row))

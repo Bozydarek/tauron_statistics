@@ -45,4 +45,3 @@ def balance_color(num: Numeric, padding: int = 0, unit: str = "") -> str:
     return (
         f"{Color.RED if num < 0 else Color.GREEN}"
         f"{out:>{padding}}{unit}{Color.END}")
-

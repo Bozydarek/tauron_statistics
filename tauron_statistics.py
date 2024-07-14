@@ -114,7 +114,13 @@ def main() -> None:
 
     table = TableView()
     table.set_header([
-        "Date", "Usage", "kWh/day", "RE", "RE 2 use", "(+) days", "Balance"])
+        ("date", "Date"),
+        ("usage", "Usage"),
+        ("kwh_per_day", "kWh/day"),
+        ("renewable_energy", "RE"),
+        ("renewable_energy_for_use", "RE 2 use"),
+        ("days_with_positive_balance", "(+) days"),
+        ("monthly_balance", "Balance")])
 
     totalUsage = 0.0
     totalRE = 0.0
