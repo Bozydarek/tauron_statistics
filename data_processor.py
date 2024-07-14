@@ -14,6 +14,7 @@ from util import print_err, print_wrn, print_note
 RE_RETRIEVE_RATIO = 0.8  # 80% of cumulated energy sent to the grid
 CONFIG_FILE_PATH = "config.yml"
 
+
 # From python3.11 'StrEnum' can be used
 class DataTypes(str, Enum):
     """Energy types"""

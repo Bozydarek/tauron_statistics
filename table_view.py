@@ -32,7 +32,7 @@ class Cell():
 
 
 class TableView():
-    headers: list[str] = []
+    headers: list[tuple[str, str]] = []
     rows: list[list[Any]] = []
 
     def __init__(self, col_width: int = 8) -> None:
