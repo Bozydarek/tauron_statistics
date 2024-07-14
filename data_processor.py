@@ -1,3 +1,4 @@
+import os
 import csv
 import yaml
 
@@ -11,7 +12,7 @@ from month import last_day_of_month
 from util import print_err, print_wrn, print_note
 
 RE_RETRIEVE_RATIO = 0.8  # 80% of cumulated energy sent to the grid
-
+CONFIG_FILE_PATH = "config.yml"
 
 # From python3.11 'StrEnum' can be used
 class DataTypes(str, Enum):
@@ -190,7 +191,10 @@ def load_cache() -> list[DataPoint]:
 
 
 def load_config() -> dict[str, Any]:
-    with open("config.yml", 'r') as config_file:
+    if not os.path.isfile(CONFIG_FILE_PATH):
+        print_err(f"Configuration file ({CONFIG_FILE_PATH}) not found!")
+
+    with open(CONFIG_FILE_PATH, 'r') as config_file:
         try:
             config = yaml.safe_load(config_file)
         except yaml.YAMLError as e:
