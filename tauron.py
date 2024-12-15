@@ -65,7 +65,8 @@ def gather_and_parse_data_from_tauron(
         print_note(
             f"Gathering data for {months_to_gather} "
             f"month{'s' if months_to_gather > 1 else ''}... ")
-        print("[", end='', flush=True)
+        if months_to_gather > 1:
+            print("[", end='', flush=True)
     data: list[DataPoint] = []
     while (iter_date < date_today):
         # NOTE: "new API" specification:
@@ -106,9 +107,9 @@ def gather_and_parse_data_from_tauron(
 
         iter_date += rd.relativedelta(months=+1, day=1)
 
-        if not quiet:
+        if not quiet and months_to_gather > 1:
             print(".", end='', flush=True)
-    if not quiet:
+    if not quiet and months_to_gather > 1:
         print("]")
 
     return data
