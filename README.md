@@ -2,7 +2,8 @@
 
 This repository contains a python scripts that can check your energy usage statistics (based on unofficial API from eLicznik service) and show them in a form of a simple ASCII table.
 
-**Disclaimer: Use at Your Own Risk. ⚠️**
+> [!WARNING]
+> Disclaimer: Use at Your Own Risk.
 
 ## Features
 
@@ -28,6 +29,9 @@ cd tauron_statistics
 python3 -m pip -r requirements.txt
 ```
 
+> [!TIP]
+> You might want to use venv for installing dependencies.
+
 Create configuration file:
 ```
 cp config.example.yml config.yml
@@ -36,7 +40,8 @@ cp config.example.yml config.yml
 
 ## Configuration file
 
-To use this script you need to create a configuration (`config.yml`) based on the example (`config.example.yml`).
+> [!IMPORTANT]
+> To use this script you need to create a configuration (`config.yml`) based on the example (`config.example.yml`).
 
 Required values:
 * `meter_id`
