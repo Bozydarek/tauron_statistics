@@ -8,3 +8,5 @@ local_test.py
 
 .vscode/
 .env/
+.venv/
+.envrc
