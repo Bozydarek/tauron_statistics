@@ -2,7 +2,7 @@ import os
 import csv
 import yaml
 
-from enum import Enum
+from enum import StrEnum
 from datetime import date
 from dataclasses import dataclass
 
@@ -15,10 +15,10 @@ RE_RETRIEVE_RATIO = 0.8  # 80% of cumulated energy sent to the grid
 CONFIG_FILE_PATH = "config.yml"
 
 
-# From python3.11 'StrEnum' can be used
-class DataTypes(str, Enum):
+class DataTypes(StrEnum):
     """Energy types"""
-    consume = 'consum'  # That is a value provided by Tauron
+    # Based on values provided by Tauron
+    consume = 'consum'
     oze = 'oze'
 
     def __str__(self) -> str:
@@ -166,8 +166,8 @@ class DataPoint:
 def load_cache() -> list[DataPoint]:
     data = []
     try:
-        with open('cache.csv') as csvfile:
-            reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        with open('cache.csv') as csv_file:
+            reader = csv.reader(csv_file, delimiter=';', quotechar='|')
             for row in reader:
                 if len(row) != 6:
                     raise ValueError(
@@ -215,9 +215,9 @@ def save_cache(
             data_to_save[-1].month.month == last_datapoint_date.month):
         data_to_save = data[:-1]
 
-    print_note("Save cache...")
-    with open('cache.csv', 'w') as csvfile:
+    print_note("Saving cache...")
+    with open('cache.csv', 'w') as csv_file:
         cache = csv.writer(
-            csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csv_file, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
         cache.writerows(data_to_save)

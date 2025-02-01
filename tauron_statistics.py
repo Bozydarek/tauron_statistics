@@ -174,7 +174,7 @@ def main() -> None:
             args.data_year is None or date_today.year == args.data_year):
 
         days = last_day_of_month(date_today).day
-        # we don't get todays data so we need to subtract 1 day
+        # we don't get today data so we need to subtract 1 day
         ratio = days / (date_today.day - 1)
 
         table.add_divider()
