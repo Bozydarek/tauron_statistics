@@ -106,7 +106,7 @@ def main() -> None:
             if args.use_cache:
                 # NOTE: there is no point in saving cache,
                 # if we don't get any new data
-                save_cache(all_data, date_today)
+                save_cache(all_data, date_of_last_dp)
 
     # print data
     if args.data_year is not None:

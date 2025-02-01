@@ -206,11 +206,13 @@ def load_config() -> dict[str, Any]:
 
 
 def save_cache(
-        data: list[DataPoint], date_today: date) -> None:
+        data: list[DataPoint], last_datapoint_date: date) -> None:
 
     data_to_save = data
-    if (data_to_save[-1].month.year == date_today.year and
-            data_to_save[-1].month.month == date_today.month):
+
+    # Skip current month since data might be incomplete
+    if (data_to_save[-1].month.year == last_datapoint_date.year and
+            data_to_save[-1].month.month == last_datapoint_date.month):
         data_to_save = data[:-1]
 
     print_note("Save cache...")
