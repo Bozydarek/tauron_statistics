@@ -1,6 +1,4 @@
-import os
 import csv
-import yaml
 
 from enum import StrEnum
 from datetime import date
@@ -9,10 +7,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from month import last_day_of_month
-from util import print_err, print_wrn, print_note
+from util import print_wrn, print_note
 
 RE_RETRIEVE_RATIO = 0.8  # 80% of cumulated energy sent to the grid
-CONFIG_FILE_PATH = "config.yml"
 
 
 class DataTypes(StrEnum):
@@ -191,20 +188,6 @@ def load_cache() -> list[DataPoint]:
     return data
 
 
-def load_config() -> dict[str, Any]:
-    if not os.path.isfile(CONFIG_FILE_PATH):
-        print_err(f"Configuration file ({CONFIG_FILE_PATH}) not found!")
-
-    with open(CONFIG_FILE_PATH, 'r') as config_file:
-        try:
-            config = yaml.safe_load(config_file)
-        except yaml.YAMLError as e:
-            print_err(f"There is a problem with configuration file: {e}")
-        else:
-            print_note("Configuration file loaded.")
-    return config
-
-
 def save_cache(
         data: list[DataPoint], last_datapoint_date: date) -> None:
 
@@ -213,6 +196,9 @@ def save_cache(
     # Skip current month since data might be incomplete
     if (data_to_save[-1].month.year == last_datapoint_date.year and
             data_to_save[-1].month.month == last_datapoint_date.month):
+        print_note(
+            f"Skipping {last_datapoint_date.year}-{last_datapoint_date.month} "
+            f"from saving in cache.")
         data_to_save = data[:-1]
 
     print_note("Saving cache...")

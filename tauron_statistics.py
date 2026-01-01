@@ -3,8 +3,9 @@ from datetime import date
 
 from dateutil import relativedelta as rd
 
+from config import load_config
 from data_processor import (
-    DataPoint, RE_RETRIEVE_RATIO, load_config, load_cache, save_cache)
+    DataPoint, RE_RETRIEVE_RATIO, load_cache, save_cache)
 from month import last_day_of_month
 from table_view import TableView, Cell, CellAlignment
 from tauron import login_to_tauron, gather_and_parse_data_from_tauron
@@ -104,7 +105,7 @@ def main() -> None:
             print_note(f"Last day with useful data is {date_of_last_dp}")
 
             if args.use_cache:
-                # NOTE: there is no point in saving cache,
+                # TODO: consider skipping saving cache,
                 # if we don't get any new data
                 save_cache(all_data, date_of_last_dp)
 
@@ -195,7 +196,7 @@ def main() -> None:
 
     if args.format is not None:
         # No summary if we want different format
-        exit(0)
+        exit()
 
     print(table, end="")
 
